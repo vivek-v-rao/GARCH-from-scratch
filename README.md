@@ -160,7 +160,3 @@ Edit the constants near the top of `main()` in `xgarch.py` or `xgarch_gjr.py`:
   - `floor` prevents h_t from going non-positive due to rounding.
 - If you choose parameters with κ >= 1, the process has no finite
   unconditional variance; the theory checks in `theoretical_*` will raise.
-
-## License
-
-Add the license you prefer (MIT/BSD/Apache-2.0/etc.).
