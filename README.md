@@ -7,7 +7,7 @@ Pure-Python (numpy/pandas) simulation and basic theory checks for:
 
 The scripts compare empirical autocorrelations from simulation to closed-form
 theoretical autocorrelations of squared returns. The GJR script also compares
-the leverage cross-correlation corr(eps_t, eps_{t+k}^2) to its theoretical
+the leverage cross-correlation corr(ε_t, ε_{t+k}^2) to its theoretical
 geometric decay (the level uses a simulation estimate of E[h^(3/2)]).
 
 All formulas in the code assume symmetric innovations with E[z^2]=1.
@@ -35,7 +35,7 @@ All formulas in the code assume symmetric innovations with E[z^2]=1.
 - `xgarch_gjr.py`
   - main program for GJR-GARCH(1,1)
   - prints a table comparing theoretical vs empirical ACF of squared returns
-  - prints a table comparing theoretical vs empirical corr(eps_t, eps_{t+k}^2)
+  - prints a table comparing theoretical vs empirical corr(ε_t, ε_{t+k}^2)
 
 ## Quick start
 
@@ -66,10 +66,10 @@ Both scripts run multiple simulations with different seeds and print:
 
 ### Standardized Student t innovations
 
-The code uses numpy's `standard_t(df=nu)` and rescales it so Var(z)=1:
+The code uses numpy's `standard_t(df=ν)` and rescales it so Var(z)=1:
 
-- if x ~ t_nu, then Var(x) = nu/(nu-2) for nu>2
-- set z = x * sqrt((nu-2)/nu) so Var(z)=1
+- if x ~ t_ν, then Var(x) = ν/(ν-2) for ν>2
+- set z = x * sqrt((ν-2)/ν) so Var(z)=1
 
 This is what the simulators use in:
 
@@ -78,64 +78,64 @@ This is what the simulators use in:
 
 ### Symmetric GARCH(1,1)
 
-eps_t = sqrt(h_t) * z_t
+ε_t = sqrt(h_t) * z_t
 
-h_t = omega + alpha * eps_{t-1}^2 + beta * h_{t-1}
+h_t = ω + α * ε_{t-1}^2 + β * h_{t-1}
 
 Stationarity (finite unconditional variance) requires:
 
-kappa = alpha + beta < 1
+κ = α + β < 1
 
 ### GJR-GARCH(1,1)
 
-eps_t = sqrt(h_t) * z_t
+ε_t = sqrt(h_t) * z_t
 
-h_t = omega + alpha * eps_{t-1}^2 + gamma * eps_{t-1}^2 * 1{eps_{t-1}<0} + beta * h_{t-1}
+h_t = ω + α * ε_{t-1}^2 + γ * ε_{t-1}^2 * 1{ε_{t-1}<0} + β * h_{t-1}
 
-For symmetric z_t, P(eps_{t-1}<0)=1/2, so stationarity (finite unconditional
+For symmetric z_t, P(ε_{t-1}<0)=1/2, so stationarity (finite unconditional
 variance) requires:
 
-kappa = alpha + beta + 0.5*gamma < 1
+κ = α + β + 0.5*γ < 1
 
 ## Theoretical ACF of squared returns
 
-Let s_t = eps_t^2. Under symmetric innovations with E[z^2]=1 and finite fourth
+Let s_t = ε_t^2. Under symmetric innovations with E[z^2]=1 and finite fourth
 moment, the autocorrelation of s_t is geometric:
 
-rho_s(k) = Corr(s_{t+k}, s_t) = rho_s(1) * kappa^(k-1),  k>=1
+ρ_s(k) = Corr(s_{t+k}, s_t) = ρ_s(1) * κ^(k-1),  k>=1
 
-The code computes rho_s(1) in closed form by solving for E[h] and E[h^2].
+The code computes ρ_s(1) in closed form by solving for E[h] and E[h^2].
 
 ### Fourth-moment condition
 
-To have finite Var(eps_t^2) (and therefore a well-defined ACF of squared
+To have finite Var(ε_t^2) (and therefore a well-defined ACF of squared
 returns), you also need a finite fourth moment and a contraction condition
-for E[h^2]. The code checks this via `eta < 1`.
+for E[h^2]. The code checks this via `η < 1`.
 
-For standardized Student t, you need nu > 4 and:
+For standardized Student t, you need ν > 4 and:
 
-m4 = E[z^4] = 3*(nu-2)/(nu-4)
+m4 = E[z^4] = 3*(ν-2)/(ν-4)
 
-#### Symmetric GARCH(1,1): eta
+#### Symmetric GARCH(1,1): η
 
-eta = beta^2 + 2*alpha*beta + alpha^2*m4
+η = β^2 + 2*α*β + α^2*m4
 
-#### GJR-GARCH(1,1): eta
+#### GJR-GARCH(1,1): η
 
 Define:
 
-a2 = alpha^2 + alpha*gamma + 0.5*gamma^2
+a2 = α^2 + α*γ + 0.5*γ^2
 
-eta = beta^2 + 2*beta*(alpha + 0.5*gamma) + a2*m4
+η = β^2 + 2*β*(α + 0.5*γ) + a2*m4
 
 ## Leverage cross-correlation for GJR
 
 The GJR script also reports:
 
-corr(eps_t, eps_{t+k}^2), k>=1
+corr(ε_t, ε_{t+k}^2), k>=1
 
 For symmetric z_t, this cross-correlation decays geometrically at the same
-rate kappa. The level depends on E[h^(3/2)], which is not computed in closed
+rate κ. The level depends on E[h^(3/2)], which is not computed in closed
 form in this repo; `xgarch_gjr.py` estimates it from the simulated path and
 plugs it into `theoretical_crosscorr_return_future_sq`.
 
@@ -146,7 +146,7 @@ zero by symmetry, so `xgarch.py` does not compute them.
 
 Edit the constants near the top of `main()` in `xgarch.py` or `xgarch_gjr.py`:
 
-- `omega, alpha, beta, nu` (and `gamma` for GJR)
+- ω, α, β, ν (and γ for GJR)
 - `nobs` number of kept observations
 - `burn` burn-in length
 - `nlags` number of ACF lags to compare
@@ -158,7 +158,7 @@ Edit the constants near the top of `main()` in `xgarch.py` or `xgarch_gjr.py`:
 - This repo is intended for learning, sanity checks, and small experiments.
 - Numerical safeguards:
   - `floor` prevents h_t from going non-positive due to rounding.
-- If you choose parameters with kappa >= 1, the process has no finite
+- If you choose parameters with κ >= 1, the process has no finite
   unconditional variance; the theory checks in `theoretical_*` will raise.
 
 ## License
